@@ -76,7 +76,7 @@ namespace Failistootlus
                         {
                             rets.Add(rida);
 
-                            }//
+                            }//  
                     }
 
                     catch (Exception)
