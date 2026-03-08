@@ -1,9 +1,6 @@
 ﻿using System;
-using System.Collections;
 using System.Collections.Generic;
-using System.ComponentModel.Design;
-using System.Text;
-using static System.Runtime.InteropServices.JavaScript.JSType;
+using System.IO;
 
 namespace Failistootlus
 {
@@ -14,151 +11,171 @@ namespace Failistootlus
         {
             try
             {
-                string path = Path.Combine(AppDomain.CurrentDomain.BaseDirectory, "Retseptid.txt");
-                StreamWriter text = new StreamWriter(path, true); 
-                Console.WriteLine("Sisesta toit: ");
-                string lause = Console.ReadLine();
-                text.WriteLine(lause);
-                text.Close();
+                string retseptPath = Path.Combine(AppDomain.CurrentDomain.BaseDirectory, "Retseptid.txt");
+                string koostisosadPath = Path.Combine(AppDomain.CurrentDomain.BaseDirectory, "Koostisosad.txt");
 
-                path = Path.Combine(AppDomain.CurrentDomain.BaseDirectory, "Koostisosad.txt");
-                text = new StreamWriter(path, true);
-                ConsoleKeyInfo key = new ConsoleKeyInfo();
+           
+                if (File.Exists(retseptPath))
+                {
+                    Console.WriteLine("Olemasolevad toidud");
+                    foreach (string rida in File.ReadAllLines(retseptPath))
+                        Console.WriteLine($"  - {rida}");
+                    Console.WriteLine();
+                }
+
+                Console.Write("Sisesta uus toidu nimi: ");
+                string toit = Console.ReadLine();
+
+                StreamWriter retseptWriter = new StreamWriter(retseptPath, true);
+                retseptWriter.WriteLine(toit);
+                retseptWriter.Close();
+
+        
+                if (File.Exists(koostisosadPath))
+                {
+                    Console.WriteLine("\nOlemasolevad koostisosad");
+                    foreach (string rida in File.ReadAllLines(koostisosadPath))
+                        Console.WriteLine($"  {rida}");
+                    Console.WriteLine();
+                }
+
+                StreamWriter koostisWriter = new StreamWriter(koostisosadPath, true);
+                ConsoleKeyInfo key;
                 do
                 {
+                    Console.Write("Sisesta uus koostisosa (Backspace = lõpeta): ");
+                    string koostisosa = Console.ReadLine();
+                    key = Console.ReadKey(true);
 
-
-                    
-                   
-                    Console.Write("Sisesta toitu Koostisosad(nupp Backspace lõppuks): ");
-                    lause = Console.ReadLine();
-                    key = Console.ReadKey();
-                    text.WriteLine(lause);
-                    
+                    if (!string.IsNullOrWhiteSpace(koostisosa))
+                    {
+                        koostisWriter.WriteLine(koostisosa);
+                        Console.WriteLine($"{koostisosa} lisatud!");
+                    }
 
                 } while (key.Key != ConsoleKey.Backspace);
-               
-                text.Close();
+
+                koostisWriter.Close();
+                Console.WriteLine(" Kõik salvestatud!");
             }
-            catch (Exception)
+            catch (Exception e)
             {
-                Console.WriteLine("Mingi viga failiga");
+                Console.WriteLine($"Viga: {e.Message}");
             }
         }
+
+      
         public static void Kogu_menüü_kuvamine()
         {
             try
             {
-              
-               
+                string path = Path.Combine(AppDomain.CurrentDomain.BaseDirectory, "Retseptid.txt");
+                Console.WriteLine("Retseptid");
+                foreach (string rida in File.ReadAllLines(path))
+                    Console.WriteLine($"    {rida}");
+            }
+            catch (Exception)
+            {
+                Console.WriteLine("Retseptid.txt faili ei leitud!");
+            }
 
-                List<string> rets = new List<string>();
-                try
-                {
-                    string path = Path.Combine(AppDomain.CurrentDomain.BaseDirectory, "Retseptid.txt");
-                    foreach (string rida in File.ReadAllLines(path))
-                    {
-                        rets.Add(rida);
+            try
+            {
+                string path = Path.Combine(AppDomain.CurrentDomain.BaseDirectory, "Koostisosad.txt");
+                Console.WriteLine("\nKoostisosad");
+                foreach (string rida in File.ReadAllLines(path))
+                    Console.WriteLine($"  - {rida}");
+            }
+            catch (Exception)
+            {
+                Console.WriteLine("Koostisosad.txt faili ei leitud!");
+            }
+        }
 
-                    }
-                }
-
-                catch (Exception)
-                {
-
-                    Console.WriteLine("faili ei eksisteeri: ");
-                }
-                List<string> koostisosad  = new List<string>();
-                    try
-                    {
-                        string path2 = Path.Combine(AppDomain.CurrentDomain.BaseDirectory, "Koostisosad.txt");
-                        foreach (string rida in File.ReadAllLines(path2))
-                        {
-                            rets.Add(rida);
-
-                            }//  
-                    }
-
-                    catch (Exception)
-                    {
-
-                        Console.WriteLine("faili ei eksisteeri: ");
-                    }
-
-                StreamReader text = new StreamReader(path2);
-                string laused = text.ReadToEnd();
-                Console.WriteLine(laused);
-          
-
-        
+     
         public static void Koostisosade_muutmine_nimekirjas()
         {
-            List<string> list = new List<string>();
             try
             {
-
                 string path = Path.Combine(AppDomain.CurrentDomain.BaseDirectory, "Koostisosad.txt");
+                List<string> list = new List<string>();
+
                 foreach (string rida in File.ReadAllLines(path))
-                {
                     list.Add(rida);
 
-                }
                 if (list.Count > 0)
                     list[0] = "Kvaliteetne oliiviõli";
-                list.Remove("ketšupp");
-                 foreach (string rida in File.ReadAllLines(path))
-                {
-                    list.Add(rida);
 
+                ConsoleKeyInfo key;
+                do
+                {
+                   
+                    Console.WriteLine("Praegune nimekiri");
+                    for (int i = 0; i < list.Count; i++)
+                        Console.WriteLine($"  {i + 1}. {list[i]}");
+
+                    Console.Write("\nSisesta toit mida tahad eemaldada (Backspace = lõpeta): ");
+                    string lause = Console.ReadLine();
+                    key = Console.ReadKey(true);
+
+                    if (!string.IsNullOrEmpty(lause))
+                    {
+                        if (list.Remove(lause))
+                            Console.WriteLine($"{lause} eemaldatud!");
+                        else
+                            Console.WriteLine($"{lause} ei leitud nimekirjast.");
+                    }
+
+                } while (key.Key != ConsoleKey.Backspace);
+
+                using (StreamWriter text = new StreamWriter(path, false))
+                {
+                    foreach (string rida in list)
+                        text.WriteLine(rida);
                 }
 
+                Console.WriteLine("Lõplik nimekiri");
+                foreach (string rida in list)
+                    Console.WriteLine($"  - {rida}");
 
+                Console.WriteLine("\nNimekiri salvestatud!");
             }
-           
-
-            catch (Exception)
+            catch (Exception e)
             {
-                Console.WriteLine("Viga failiga!");
+                Console.WriteLine($"Viga: {e.Message}");
             }
-
-        
-
         }
+
         public static List<string> Külmkapi_kontroll_ehk_otsing_listist()
         {
-            List<string> Contains = new List<string>();
+            List<string> list = new List<string>();
+
             try
             {
-
-                string path = @$"..\..\..\külmkapp.txt";
+                string path = Path.Combine(AppDomain.CurrentDomain.BaseDirectory, "Koostisosad.txt");
                 foreach (string rida in File.ReadAllLines(path))
-                {
-                    Contains.Add(rida);
-
-                }
-
-
+                    list.Add(rida);
             }
-
             catch (Exception)
             {
-                Console.WriteLine("Viga failiga!");
+                Console.WriteLine("Viga faili lugemisel!");
+                return list;
             }
-            Console.WriteLine("Sisesta mis te tahate ostida: ");
-            string ostitav = Console.ReadLine();
 
-            if (Contains.Contains(ostitav))
-            {
-                Console.WriteLine("Koostisosa on olemas!");
-            }
+           
+            Console.WriteLine("Saadaval koostisosad");
+            foreach (string rida in list)
+                Console.WriteLine($"  {rida}");
+
+            Console.WriteLine("Sisesta mida soovid otsida: ");
+            string otsitav = Console.ReadLine();
+
+            if (list.Contains(otsitav))
+                Console.WriteLine($"{otsitav} on nimekirjas olemas!");
             else
-            {
-                Console.WriteLine("Seda koostisosa meil retseptis ei ole.");
-            }
-            return Contains;
-            
+                Console.WriteLine($"{otsitav} ei ole retseptis.");
 
-            
+            return list;
         }
     }
 }
