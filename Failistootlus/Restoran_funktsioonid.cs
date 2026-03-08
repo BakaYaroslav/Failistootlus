@@ -14,7 +14,7 @@ namespace Failistootlus
                 string retseptPath = Path.Combine(AppDomain.CurrentDomain.BaseDirectory, "Retseptid.txt");
                 string koostisosadPath = Path.Combine(AppDomain.CurrentDomain.BaseDirectory, "Koostisosad.txt");
 
-           
+
                 if (File.Exists(retseptPath))
                 {
                     Console.WriteLine("Olemasolevad toidud");
@@ -30,7 +30,7 @@ namespace Failistootlus
                 retseptWriter.WriteLine(toit);
                 retseptWriter.Close();
 
-        
+
                 if (File.Exists(koostisosadPath))
                 {
                     Console.WriteLine("\nOlemasolevad koostisosad");
@@ -64,7 +64,7 @@ namespace Failistootlus
             }
         }
 
-      
+
         public static void Kogu_menüü_kuvamine()
         {
             try
@@ -92,7 +92,7 @@ namespace Failistootlus
             }
         }
 
-     
+
         public static void Koostisosade_muutmine_nimekirjas()
         {
             try
@@ -109,7 +109,7 @@ namespace Failistootlus
                 ConsoleKeyInfo key;
                 do
                 {
-                   
+
                     Console.WriteLine("Praegune nimekiri");
                     for (int i = 0; i < list.Count; i++)
                         Console.WriteLine($"  {i + 1}. {list[i]}");
@@ -162,7 +162,7 @@ namespace Failistootlus
                 return list;
             }
 
-           
+
             Console.WriteLine("Saadaval koostisosad");
             foreach (string rida in list)
                 Console.WriteLine($"  {rida}");
@@ -176,6 +176,26 @@ namespace Failistootlus
                 Console.WriteLine($"{otsitav} ei ole retseptis.");
 
             return list;
+        }
+
+        public static void Uuendatud_nimekirja_salvestamine(List<string> list)
+        {
+            try
+            {
+                string path = Path.Combine(AppDomain.CurrentDomain.BaseDirectory, "Koostisosad.txt");
+
+                Console.WriteLine("Praegune nimekiri");
+                for (int i = 0; i < list.Count; i++)
+                    Console.WriteLine($"  {i + 1}. {list[i]}");
+
+                File.WriteAllLines(path, list);
+
+                Console.WriteLine("Uus retsept on edukalt faili salvestatud!");
+            }
+            catch (Exception e)
+            {
+                Console.WriteLine($"Viga: {e.Message}");
+            }
         }
     }
 }
